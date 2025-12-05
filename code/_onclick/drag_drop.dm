@@ -99,9 +99,9 @@
 	chargedprog = 0
 
 	if(!mob.fixedeye) //If fixedeye isn't already enabled, we need to set this var
-		mob.tempfixeye = TRUE //Change icon to 'target' red eye
 		mob.nodirchange = TRUE
-
+	mob.tempfixeye = TRUE //Change icon to 'target' red eye
+	
 	for(var/atom/movable/screen/eye_intent/eyet in mob.hud_used.static_inventory)
 		eyet.update_icon(mob) //Update eye icon
 
@@ -187,6 +187,9 @@
 /mob
 	var/datum/intent/curplaying
 
+/atom/proc/should_click_on_mouse_up(var/atom/original_object)
+	return TRUE
+
 /client/MouseUp(object, location, control, params)
 	charging = 0
 //	mob.update_warning()
@@ -197,8 +200,8 @@
 		mob.curplaying.on_mouse_up()
 
 	if(!mob.fixedeye)
-		mob.tempfixeye = FALSE
 		mob.nodirchange = FALSE
+	mob.tempfixeye = FALSE
 
 	if(mob.hud_used)
 		for(var/atom/movable/screen/eye_intent/eyet in mob.hud_used.static_inventory)
@@ -233,7 +236,7 @@
 
 	if(tcompare)
 		var/atom/target_atom = object
-		if(istype(target_atom) && tcompare != mob && (mob.atkswinging == "middle" || (mob.atkswinging && object != tcompare)))
+		if(istype(target_atom) && target_atom.should_click_on_mouse_up(tcompare) && tcompare != mob && (mob.atkswinging == "middle" || (mob.atkswinging && object != tcompare)))
 			target_atom.Click(location, control, params)
 		tcompare = null
 

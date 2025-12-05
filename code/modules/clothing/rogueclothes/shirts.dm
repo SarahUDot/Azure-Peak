@@ -143,6 +143,7 @@
 /obj/item/clothing/suit/roguetown/shirt/tunic/noblecoat
 	name = "fancy coat"
 	desc = "A fancy tunic and coat combo. How elegant."
+	alternate_worn_layer = TABARD_LAYER
 	slot_flags = ITEM_SLOT_SHIRT|ITEM_SLOT_ARMOR|ITEM_SLOT_CLOAK
 	icon_state = "noblecoat"
 	sleevetype = "noblecoat"
@@ -711,7 +712,7 @@
 		return
 
 /obj/item/clothing/suit/roguetown/shirt/undershirt/easttats/process()
-	if(obj_integrity >= max_integrity) 
+	if(obj_integrity >= max_integrity)
 		STOP_PROCESSING(SSobj, src)
 		src.visible_message(span_notice("The [src] flow more calmly, as they finish resting and regain their strength."), vision_distance = 1)
 		return
@@ -719,3 +720,35 @@
 		src.last_repair = world.time
 		obj_integrity = min(obj_integrity + src.repair_amount, src.max_integrity)
 	..()
+
+/obj/item/clothing/suit/roguetown/shirt/dress/maid
+	slot_flags = ITEM_SLOT_ARMOR|ITEM_SLOT_SHIRT
+	name = "maid dress"
+	desc = "A distinctive black dress that should be kept clean and tidy - unless you want to be disciplined."
+	body_parts_covered = CHEST|GROIN|ARMS|LEGS|VITALS
+	boobed = TRUE
+	item_state = "maiddress"
+	icon_state = "maiddress"
+	icon = 'icons/roguetown/clothing/special/maids.dmi'
+	mob_overlay_icon = 'icons/roguetown/clothing/special/onmob/maids.dmi'
+	sleeved = 'icons/roguetown/clothing/special/onmob/maids.dmi'
+	var/open_wear = FALSE
+
+/obj/item/clothing/suit/roguetown/shirt/dress/maid/attack_right(mob/user)
+	switch(open_wear)
+		if(FALSE)
+			name = "open maid dress"
+			body_parts_covered = null
+			open_wear = TRUE
+			flags_inv = HIDEBOOB
+			to_chat(usr, span_warning("Now wearing radically!"))
+		if(TRUE)
+			name = "maid dress"
+			body_parts_covered = CHEST|GROIN|ARMS|LEGS|VITALS
+			open_wear = FALSE
+			flags_inv = HIDEBOOB|HIDECROTCH
+			to_chat(usr, span_warning("Now wearing normally!"))
+	update_icon()
+	if(ismob(loc))
+		var/mob/L = loc
+		L.update_inv_armor()

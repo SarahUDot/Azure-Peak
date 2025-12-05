@@ -1,9 +1,4 @@
-#define DULLFACTOR_COUNTERED_BY 1.2 // If a shaft is COUNTERED by a weapon type, this is the damage to go for
-#define DULLFACTOR_NEUTRAL 1 // If a shaft is NEUTRAL to a weapon type, this is the damage to go for
-#define DULLFACTOR_COUNTERS 0.8 // If a shaft COUNTERS a damage type, this is the damage to go for
-#define DULLFACTOR_ANTAG 0.5 // For Grand Shaft. Also for dull blade
-// Previously value were closer to 0.4 - 0.5 and 1.5 - 1.7x, but it felt like it make weapons
-// counter certain shaft type too hard, so now the value is between 0.8 to 1.2x for regular type
+#define ATTACK_OVERRIDE_NODEFENSE 2
 
 /**
   *This is the proc that handles the order of an item_attack.
@@ -92,8 +87,6 @@
 	var/pegleg = 0			//Handles check & slowdown for peglegs. Fuckin' bootleg, literally, but hey it at least works.
 	var/construct = 0
 	var/burialrited = FALSE
-
-#define ATTACK_OVERRIDE_NODEFENSE 2
 
 /obj/item/proc/attack(mob/living/M, mob/living/user)
 	var/override_status
@@ -670,7 +663,7 @@
 // Click parameters is the params string from byond Click() code, see that documentation.
 /obj/item/proc/afterattack(atom/target, mob/user, proximity_flag, click_parameters)
 	SEND_SIGNAL(src, COMSIG_ITEM_AFTERATTACK, target, user, proximity_flag, click_parameters)
-	SEND_SIGNAL(user, COMSIG_MOB_ITEM_AFTERATTACK, target, user, proximity_flag, click_parameters)
+	SEND_SIGNAL(user, COMSIG_MOB_ITEM_AFTERATTACK, target, src, proximity_flag, click_parameters)
 	if(force_dynamic && !user.used_intent.tranged && !user.used_intent.tshield)
 		if(proximity_flag && isopenturf(target) && !user.used_intent?.noaa)
 			var/adf = user.used_intent.clickcd
@@ -731,13 +724,20 @@
 	if(verb_appendix)
 		message_verb += verb_appendix
 	if(hit_area)
-		message_hit_area = " in the [span_userdanger(hit_area)]"
-	var/attack_message = "[src] is [message_verb][message_hit_area] with [I]!"
-	var/attack_message_local = "I'm [message_verb][message_hit_area] with [I]!"
+		message_hit_area = "[hit_area]"
+	var/attack_message = span_combatsecondary("[src] is [message_verb] in the [span_combatsecondarybp(message_hit_area)] with [I]!")
+	var/attack_message_local = span_danger("I'm [message_verb] in the [span_userdanger(message_hit_area)] with [I]!")
 	if(user in viewers(src, null))
-		attack_message = "[user] [message_verb] [src][message_hit_area] with [I]!"
-		attack_message_local = "[user] [message_verb] me[message_hit_area] with [I]!"
-	visible_message(span_danger("[attack_message][next_attack_msg.Join()]"),\
-		span_danger("[attack_message_local][next_attack_msg.Join()]"), null, COMBAT_MESSAGE_RANGE)
+		attack_message = span_combatsecondary("[user] [message_verb] [src] in the [span_combatsecondarybp(message_hit_area)] with [I]!")
+		attack_message_local = span_danger("[user] [message_verb] me in the [span_userdanger(message_hit_area)] with [I]!")
+
+	//Janky, but you'll see BIG TEXT for both the hits you make and take.
+	if(src != user)
+		var/attack_message_self = span_combatprimary("[user] [message_verb] [src] in the [span_combatsecondarybp(message_hit_area)] with [I]!")
+		to_chat(user, "[attack_message_self][next_attack_msg.Join()]")
+	visible_message("[attack_message][span_combatsecondarysmall(next_attack_msg.Join())]",\
+		"[attack_message_local][next_attack_msg.Join()]", null, COMBAT_MESSAGE_RANGE, list(user))	//We try not to show this to the user (attacker)
 	next_attack_msg.Cut()
 	return 1
+
+#undef ATTACK_OVERRIDE_NODEFENSE

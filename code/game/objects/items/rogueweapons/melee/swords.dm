@@ -187,6 +187,7 @@
 	unequip_delay_self = 1.5 SECONDS
 	inv_storage_delay = 1.5 SECONDS
 	edelay_type = 1
+	special = /datum/special_intent/shin_swipe
 
 /obj/item/rogueweapon/sword/Initialize()
 	. = ..()
@@ -298,6 +299,7 @@
 	max_blade_int = 280
 	wdefense_wbonus = 4
 	smeltresult = /obj/item/ingot/steel
+	special = /datum/special_intent/side_sweep
 
 /obj/item/rogueweapon/sword/long/training
 	name = "training sword"
@@ -640,6 +642,22 @@
 	static_price = TRUE
 	max_integrity = 9999
 
+
+/obj/item/rogueweapon/sword/long/judgement/vlord
+	name = "\"Ichor Fang\""
+	desc = "An unholy longsword made of odd steel. A green crystalline mass covers the blade and pommel, its edges and serrations tougher and sharper than anything forged by a master swordsmith."
+	force = 40
+	force_wielded = 55
+	possible_item_intents = list(/datum/intent/sword/cut, /datum/intent/sword/thrust, /datum/intent/sword/peel, /datum/intent/sword/strike)
+	gripped_intents = list(/datum/intent/sword/cut, /datum/intent/sword/thrust, /datum/intent/sword/strike, /datum/intent/sword/chop)
+	icon_state = "vlord"
+	item_state = "vlord"
+	wbalance = WBALANCE_NORMAL
+	max_integrity = 9999
+	sellprice = 363
+	static_price = TRUE
+	equip_delay_self = 0
+	unequip_delay_self = 0
 
 /obj/item/rogueweapon/sword/long/judgement/vlord
 	name = "\"Ichor Fang\""
@@ -1079,6 +1097,7 @@
 	minstr = 5
 	wdefense = 7		//Same as rapier
 	wbalance = WBALANCE_SWIFT
+	special = /datum/special_intent/shin_swipe
 
 /datum/intent/sword/cut/sabre
 	clickcd = 8		//Faster than sword by 4
